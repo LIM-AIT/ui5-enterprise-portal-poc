@@ -1,0 +1,11 @@
+applications:
+  - name: ui5-enterprise-portal-poc
+    path: .
+    memory: 256M
+    disk_quota: 512M
+    instances: 1
+    buildpacks:
+      - nodejs_buildpack
+    command: node server.js
+    env:
+      NODE_ENV: production

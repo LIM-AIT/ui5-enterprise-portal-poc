@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <title>협력사 견적 조회</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;padding:24px;font-family:"72","Segoe UI",Arial,sans-serif;background:#f5f8fc;color:#19324a}.page{max-width:980px;margin:auto}.heading{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}.eyebrow{color:#0a6ed1;font-size:12px;font-weight:700;letter-spacing:.08em}.heading h2{margin:4px 0 6px;font-size:26px}.heading p{margin:0;color:#60798f}.request{padding:12px 15px;border:1px solid #b9dbf4;border-radius:8px;background:#edf7ff;color:#164b74;font-size:14px}.request strong{display:block;margin-bottom:4px}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.metric{padding:14px;background:#fff;border:1px solid #dbe6ef;border-radius:8px;box-shadow:0 2px 6px rgba(30,65,100,.05)}.metric span{display:block;font-size:12px;color:#668096;margin-bottom:5px}.metric strong{font-size:18px;color:#183d60}.card{overflow:hidden;background:#fff;border:1px solid #dbe6ef;border-radius:9px;box-shadow:0 3px 10px rgba(25,65,100,.07)}table{width:100%;border-collapse:collapse}th{text-align:left;padding:13px 14px;background:#f3f7fa;color:#506c84;font-size:12px}td{padding:14px;border-top:1px solid #e3ebf2;font-size:14px}tr.selected{background:#edf7ff}input[type=radio]{accent-color:#0a6ed1}.vendor{font-weight:700;color:#173c60}.badge{display:inline-block;padding:4px 8px;border-radius:12px;background:#eaf5ea;color:#107e3e;font-size:12px;font-weight:700}.badge.warn{background:#fff4d6;color:#9b6500}.footer{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:18px;padding:14px 16px;border:1px solid #dbe6ef;border-radius:8px;background:#fff}.selection{font-size:14px;color:#506c84}.selection strong{color:#173c60}button{padding:10px 16px;background:#0a6ed1;color:#fff;border:0;border-radius:5px;font-weight:700;cursor:pointer}button:hover{background:#085caf}button:active{transform:translateY(1px)}#status{margin:14px 0 0;padding:10px 13px;border-radius:6px;background:#f2f8d8;color:#315b15;font-size:14px}.success{background:#eaf7ea!important;color:#107e3e!important}@media(max-width:700px){.summary{grid-template-columns:repeat(2,1fr)}.card{overflow:auto}.footer{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="heading"><div><div class="eyebrow">NON-SAP PROCUREMENT INTEGRATION</div><h2>협력사 견적 비교</h2><p>구매요청 PR-2026-1002 · 발전소 제어반 부품 구매</p></div><div class="request"><strong>견적 마감</strong>2026-08-02 18:00</div></section>
+    <section class="summary"><div class="metric"><span>요청 예산</span><strong>₩ 2,400,000</strong></div><div class="metric"><span>접수 견적</span><strong>3 건</strong></div><div class="metric"><span>최저 견적</span><strong>₩ 2,180,000</strong></div><div class="metric"><span>예산 절감</span><strong>₩ 220,000</strong></div></section>
+    <section class="card"><table><thead><tr><th>선택</th><th>협력사</th><th>견적 금액</th><th>납기</th><th>평가</th><th>상태</th></tr></thead><tbody id="quoteRows"><tr class="selected" data-vendor="에스텍솔루션" data-amount="2180000" data-delivery="2026-08-09"><td><input type="radio" name="vendor" checked></td><td class="vendor">에스텍솔루션</td><td>₩ 2,180,000</td><td>2026-08-09</td><td>4.8 / 5.0</td><td><span class="badge">추천</span></td></tr><tr data-vendor="케이파워테크" data-amount="2260000" data-delivery="2026-08-12"><td><input type="radio" name="vendor"></td><td class="vendor">케이파워테크</td><td>₩ 2,260,000</td><td>2026-08-12</td><td>4.6 / 5.0</td><td><span class="badge">적합</span></td></tr><tr data-vendor="하이엔지니어링" data-amount="2390000" data-delivery="2026-08-07"><td><input type="radio" name="vendor"></td><td class="vendor">하이엔지니어링</td><td>₩ 2,390,000</td><td>2026-08-07</td><td>4.3 / 5.0</td><td><span class="badge warn">검토</span></td></tr></tbody></table></section>
+    <section class="footer"><div class="selection">선정 협력사: <strong id="selectedVendor">에스텍솔루션</strong> · 견적 금액: <strong id="selectedAmount">₩ 2,180,000</strong></div><button id="send" type="button">선정 결과를 Portal로 전송</button></section>
+    <p id="status">Portal과 연결되었습니다. 협력사를 선택한 뒤 결과를 전송하세요.</p>
+  </main>
+  <script>
+    const status=document.getElementById("status"),send=document.getElementById("send"),rows=[...document.querySelectorAll("#quoteRows tr")];
+    let selected=rows[0];
+    const make=(eventType,payload)=>({messageId:`iframe-${Date.now()}-${Math.random()}`,source:"vendor-quotation",target:"portal",eventType,payload,timestamp:new Date().toISOString()});
+    function select(row){selected=row;rows.forEach(item=>{item.classList.toggle("selected",item===row);item.querySelector("input").checked=item===row;});document.getElementById("selectedVendor").textContent=row.dataset.vendor;document.getElementById("selectedAmount").textContent="₩ "+Number(row.dataset.amount).toLocaleString("ko-KR");}
+    rows.forEach(row=>row.addEventListener("click",()=>select(row)));
+    window.parent.postMessage(make("VENDOR_QUOTATION_READY",{requestId:"PR-2026-1002",quoteCount:3}),window.location.origin);
+    send.addEventListener("click",()=>{const payload={requestId:"PR-2026-1002",vendor:selected.dataset.vendor,amount:Number(selected.dataset.amount),deliveryDate:selected.dataset.delivery};window.parent.postMessage(make("VENDOR_QUOTATION_SELECTED",payload),window.location.origin);status.textContent=`선정 결과가 Portal로 전송되었습니다: ${payload.vendor} / ₩ ${payload.amount.toLocaleString("ko-KR")}`;status.className="success";});
+    window.addEventListener("message",event=>{if(event.origin!==window.location.origin||!event.data?.eventType)return;status.textContent=`Portal 메시지 수신: ${event.data.eventType}`;status.className="success";});
+  </script>
+</body>
+</html>

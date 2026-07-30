@@ -1,0 +1,1 @@
+{"sap.app":{"id":"com.acme.portal.framework.samples.ui5","type":"component","applicationVersion":{"version":"0.1.0"},"title":"Sample UI5 Component"},"sap.ui5":{"dependencies":{"minUI5Version":"1.136.0","libs":{"sap.m":{},"sap.ui.core":{}}}}}

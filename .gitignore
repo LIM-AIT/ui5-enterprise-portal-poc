@@ -1,0 +1,16 @@
+# Dependencies and generated build artifacts
+node_modules/
+dist/
+**/dist/
+
+# Local configuration and logs
+.env
+.env.*
+*.log
+coverage/
+
+# Tool and editor state
+.codex/
+.ui5/
+.DS_Store
+Thumbs.db

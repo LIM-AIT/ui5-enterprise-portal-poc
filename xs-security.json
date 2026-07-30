@@ -1,0 +1,12 @@
+{
+  "xsappname": "ui5-enterprise-portal-framework-poc",
+  "tenant-mode": "dedicated",
+  "scopes": [
+    { "name": "$XSAPPNAME.PortalUser", "description": "Use the enterprise portal" },
+    { "name": "$XSAPPNAME.PortalAdmin", "description": "Manage portal configuration" }
+  ],
+  "role-templates": [
+    { "name": "PortalUser", "description": "Portal user", "scope-references": ["$XSAPPNAME.PortalUser"] },
+    { "name": "PortalAdmin", "description": "Portal administrator", "scope-references": ["$XSAPPNAME.PortalUser", "$XSAPPNAME.PortalAdmin"] }
+  ]
+}
