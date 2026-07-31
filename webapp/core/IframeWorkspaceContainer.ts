@@ -49,10 +49,17 @@ export default class IframeWorkspaceContainer {
     if (!entry) return;
     this.tabs.removeItem(entry.tab);
     entry.tab.destroy();
+    // The active application is hosted separately from the tab strip.
+    // Remove it as well when its last/active tab is closed.
+    if (this.contentArea.getItems().includes(entry.content)) this.contentArea.removeAllItems();
+    entry.content.destroy();
     this.items.delete(id);
   }
 
-  public closeAll(): void { [...this.items.keys()].forEach(id => this.close(id)); }
+  public closeAll(): void {
+    [...this.items.keys()].forEach(id => this.close(id));
+    this.contentArea.removeAllItems();
+  }
 
   public activate(id: string): void {
     const entry = this.items.get(id);

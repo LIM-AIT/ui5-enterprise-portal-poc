@@ -10,10 +10,13 @@ export default class Ui5TabWorkspaceAdapter implements WorkspaceAdapter {
   public readonly key = "UI5_TAB" as const;
   private opened = new Map<string, { info: OpenedApplication; control: Control }>();
   private activeId?: string;
-  private readonly tabs = new AdapterTabContainer(id => this.activate(id), id => this.close(id));
+  private readonly tabs: AdapterTabContainer;
+  public constructor(private readonly onWorkspaceChange?: () => void) {
+    this.tabs = new AdapterTabContainer(id => this.activate(id), id => this.close(id));
+  }
   public open(app: ApplicationConfig): void { if (!this.opened.has(app.id)) { const control = this.createContent(app); const info = this.info(app); this.opened.set(app.id, { info, control }); this.tabs.open(info, control); } this.activate(app.id); }
-  public close(id: string): void { this.tabs.close(id); this.opened.delete(id); if (this.activeId === id) this.activeId = this.opened.keys().next().value; if (this.activeId) this.tabs.activate(this.activeId); }
-  public closeAll(): void { this.tabs.closeAll(); this.opened.clear(); this.activeId = undefined; }
+  public close(id: string): void { this.tabs.close(id); this.opened.delete(id); if (this.activeId === id) this.activeId = this.opened.keys().next().value; if (this.activeId) this.tabs.activate(this.activeId); this.onWorkspaceChange?.(); }
+  public closeAll(): void { this.tabs.closeAll(); this.opened.clear(); this.activeId = undefined; this.onWorkspaceChange?.(); }
   public activate(id: string): void { if (this.opened.has(id)) { this.activeId = id; this.tabs.activate(id); } }
   public sendMessage(message: PortalMessage): void { this.postToIframe(message); }
   public getOpenedApplications(): OpenedApplication[] { return [...this.opened.values()].map(item => item.info); }

@@ -46,10 +46,14 @@ export default class CustomerMdiWorkspaceContainer {
     this.tabStrip.removeItem(entry.tab);
     entry.tab.destroy();
     this.items.delete(id);
-    this.contentArea.removeAllItems();
+    if (this.contentArea.getItems().includes(entry.content)) this.contentArea.removeAllItems();
+    entry.content.destroy();
   }
 
-  public closeAll(): void { [...this.items.keys()].forEach(id => this.close(id)); }
+  public closeAll(): void {
+    [...this.items.keys()].forEach(id => this.close(id));
+    this.contentArea.removeAllItems();
+  }
 
   public activate(id: string): void {
     const entry = this.items.get(id);

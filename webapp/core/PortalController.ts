@@ -24,7 +24,7 @@ export default class PortalController {
   private activeInstanceId?: string;
   private auditRecords: AuditRecord[] = [];
   private readonly messageListeners = new Set<() => void>();
-  private workspace: WorkspaceAdapter = new Ui5TabWorkspaceAdapter();
+  private workspace: WorkspaceAdapter = this.createWorkspaceAdapter("UI5_TAB");
   private broker = new PortalMessageBroker(EventBus.getInstance());
   private launcher = new ApplicationLauncher(this.workspace, this.broker);
   private readonly identity = new MockIdentityProvider();
@@ -97,7 +97,7 @@ export default class PortalController {
     const openedApplicationIds = this.workspace.getOpenedApplications().map(item => item.applicationId);
     const activeApplicationId = this.activeInstanceId;
     this.workspace.closeAll();
-    this.workspace = key === "IFRAME" ? new IframeWorkspaceAdapter() : key === "CUSTOM" ? new CustomWorkspaceAdapter() : new Ui5TabWorkspaceAdapter();
+    this.workspace = this.createWorkspaceAdapter(key);
     this.launcher.setWorkspaceAdapter(this.workspace);
     openedApplicationIds.forEach(applicationId => {
       const app = this.apps.find(candidate => candidate.id === applicationId);
@@ -222,6 +222,18 @@ export default class PortalController {
   }
   private recordAudit(category: AuditRecord["category"], title: string, description: string, icon: string): void {
     this.auditRecords = [{ timestamp: new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }), category, title, description, icon }, ...this.auditRecords].slice(0, 20);
+  }
+  private createWorkspaceAdapter(key: WorkspaceAdapterKey): WorkspaceAdapter {
+    const onWorkspaceChange = () => {
+      const opened = this.workspace.getOpenedApplications();
+      if (this.activeInstanceId && !opened.some(item => item.instanceId === this.activeInstanceId)) this.activeInstanceId = opened[0]?.instanceId;
+      this.messageListeners.forEach(listener => listener());
+    };
+    return key === "IFRAME"
+      ? new IframeWorkspaceAdapter(onWorkspaceChange)
+      : key === "CUSTOM"
+        ? new CustomWorkspaceAdapter(onWorkspaceChange)
+        : new Ui5TabWorkspaceAdapter(onWorkspaceChange);
   }
   private menuTree(): Array<MenuItem & { children: Array<MenuItem & { favorite: boolean }> }> {
     const groupLabels: Record<string, { title: string; icon: string; order: number }> = {
