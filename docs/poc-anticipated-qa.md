@@ -1,4 +1,4 @@
-# SAPUI5 Enterprise Portal MDI PoC 예상 질의응답
+# SAPUI5 Enterprise Portal MDI PoC Q&A
 
 ## 1. 이 PoC는 무엇을 검증했나?
 
