@@ -105,5 +105,20 @@ export default class App extends Controller {
     model.setProperty(collectionPath, remaining); model.setProperty(selectionPath, remaining[0]); model.refresh(true);
   }
   private refresh(): void { ((this.getView() as any).getModel("portal") as JSONModel).setData(this.portal.getViewState()); }
-  private renderActive(): void { const area = this.byId("workspaceContent") as VBox; area.removeAllItems(); const control = this.portal.getWorkspaceControl(); if (control) area.addItem(control); }
+  private renderActive(): void {
+    const area = this.byId("workspaceContent") as VBox;
+    area.removeAllItems();
+    area.removeStyleClass("adapterWorkspaceUi5");
+    area.removeStyleClass("adapterWorkspaceIframe");
+    area.removeStyleClass("adapterWorkspaceCustom");
+    const adapterClass: Record<string, string> = {
+      UI5_TAB: "adapterWorkspaceUi5",
+      IFRAME: "adapterWorkspaceIframe",
+      CUSTOM: "adapterWorkspaceCustom"
+    };
+    const adapterKey = (this.getView()!.getModel("portal") as JSONModel).getProperty("/workspaceAdapter") as string;
+    area.addStyleClass(adapterClass[adapterKey] || "adapterWorkspaceUi5");
+    const control = this.portal.getWorkspaceControl();
+    if (control) area.addItem(control);
+  }
 }
