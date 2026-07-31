@@ -7,10 +7,11 @@ import { OpenedApplication } from "./models";
 export default class AdapterTabContainer {
   private readonly tabs = new TabContainer();
   private readonly items = new Map<string, TabContainerItem>();
+  private selecting = false;
   public constructor(onActivate: (id: string) => void, onClose: (id: string) => void) {
     this.tabs.attachItemSelect(event => {
       const item = event.getParameter("item") as TabContainerItem;
-      onActivate(item.getKey());
+      if (!this.selecting) onActivate(item.getKey());
     });
     this.tabs.attachItemClose(event => {
       event.preventDefault();
@@ -27,6 +28,15 @@ export default class AdapterTabContainer {
   }
   public close(id: string): void { const item = this.items.get(id); if (!item) return; this.tabs.removeItem(item); item.destroy(); this.items.delete(id); }
   public closeAll(): void { [...this.items.keys()].forEach(id => this.close(id)); }
-  public activate(id: string): void { const item = this.items.get(id); if (item) this.tabs.setSelectedItem(item); }
+  public activate(id: string): void {
+    const item = this.items.get(id);
+    // TabContainer fires itemSelect for programmatic selection too. Avoid
+    // selecting the already active item again, otherwise activate() recurses.
+    if (item && this.tabs.getSelectedItem() !== id) {
+      this.selecting = true;
+      try { this.tabs.setSelectedItem(item); }
+      finally { this.selecting = false; }
+    }
+  }
   public getControl(): Control { return this.tabs; }
 }
