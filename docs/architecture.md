@@ -8,8 +8,8 @@ flowchart LR
   C --> L[Application Launcher]
   C --> B[Portal Message Broker]
   L --> W[WorkspaceAdapter]
-  W --> T[Ui5TabWorkspaceAdapter\nIconTabBar]
-  W --> I[IframeWorkspaceAdapter\nSegmentedButton + Pane]
+  W --> T[Ui5TabWorkspaceAdapter\nTabContainer]
+  W --> I[IframeWorkspaceAdapter\nCompact Tab Strip + Pane]
   W --> X[CustomWorkspaceAdapter\nCustomer MDI Window Strip]
   T --> A1[UI5 Component / iframe]
   I --> A2[React · Vue · HTML iframe]
@@ -60,9 +60,9 @@ interface WorkspaceAdapter {
 
 | Adapter | 실제 Workspace UI | 용도와 제약 |
 | --- | --- | --- |
-| `Ui5TabWorkspaceAdapter` | `AdapterTabContainer`의 SAPUI5 `IconTabBar` | 기본 통합 Workspace. UI5 Component와 iframe을 함께 실행 |
-| `IframeWorkspaceAdapter` | `IframeWorkspaceContainer`의 `SegmentedButton` + 콘텐츠 Pane | URL 기반 iframe 앱 전용. React/Vue/HTML/Nexacro 웹 URL 검증 |
-| `CustomWorkspaceAdapter` | `CustomerMdiWorkspaceContainer`의 `FlexBox` 창 스트립 + 콘텐츠 Pane | 고객사 MDI 컨트롤을 대체할 확장 위치를 보여 주는 참조 구현 |
+| `Ui5TabWorkspaceAdapter` | `AdapterTabContainer`의 SAPUI5 `TabContainer` | 기본 통합 Workspace. UI5 Component와 iframe을 함께 실행하며 각 탭을 닫을 수 있음 |
+| `IframeWorkspaceAdapter` | `IframeWorkspaceContainer`의 컴팩트 탭 스트립 + 콘텐츠 Pane | URL 기반 iframe 앱 전용. React/Vue/HTML/Nexacro 웹 URL 검증 및 각 탭 닫기 |
+| `CustomWorkspaceAdapter` | `CustomerMdiWorkspaceContainer`의 `FlexBox` 창 스트립 + 콘텐츠 Pane | 고객사 MDI 컨트롤을 대체할 확장 위치를 보여 주는 참조 구현. 각 탭 닫기 |
 
 세 Adapter는 같은 인터페이스를 공유하지만, 실제 컨테이너 Control과 탭 표시 방식은 서로 다르다. `CUSTOM`의 보라색 창 스트립은 고객사 SDK 연계가 아닌 시각적·구조적 예시이며, 실제 구축에서는 고객사 Control API를 감싼 새 Adapter로 교체한다.
 

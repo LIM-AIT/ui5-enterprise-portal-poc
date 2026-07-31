@@ -10,8 +10,8 @@ SAP Enterprise Portal End of Service 대응을 위한 고객 중립형 기술 �
 - 공통 Message Envelope와 UI5 EventBus / iframe `postMessage` 통신
 - 구매요청 → 예산검토 → 승인 시연 흐름 및 Mock 관리자 설정
 - 세 가지 실제 Workspace 구현체
-  - `UI5_TAB`: SAPUI5 `IconTabBar` 기반 표준 통합 탭
-  - `IFRAME`: `SegmentedButton`과 단일 콘텐츠 Pane 기반 Non-SAP iframe 탭
+  - `UI5_TAB`: SAPUI5 `TabContainer` 기반의 닫기 가능한 표준 통합 탭
+  - `IFRAME`: 컴팩트 탭 스트립과 단일 콘텐츠 Pane 기반 Non-SAP iframe 탭
   - `CUSTOM`: 고객사 MDI 창 스트립을 모사한 `FlexBox` 기반 확장 예시
 
 `CUSTOM`은 실제 고객사 SDK와 연결된 구현이 아니라, Portal Core 변경 없이 고객사 컨트롤로 교체할 수 있음을 보여 주는 참조 구현입니다.

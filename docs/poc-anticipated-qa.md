@@ -10,7 +10,7 @@ SAPUI5에는 SAP Enterprise Portal과 동일한 완성형 MDI 제품이 표준�
 
 ## 3. Adapter를 바꾸면 무엇이 달라지나?
 
-색상만 달라지는 것이 아니다. `UI5_TAB`은 `IconTabBar`, `IFRAME`은 `SegmentedButton`과 콘텐츠 Pane, `CUSTOM`은 `FlexBox` 기반 고객사 MDI 창 스트립을 사용한다. Portal Core는 같은 계약으로 열기·닫기·활성화·메시지를 호출하고, Adapter가 서로 다른 Workspace 컨테이너를 소유한다.
+색상만 달라지는 것이 아니다. `UI5_TAB`은 닫기 가능한 SAPUI5 `TabContainer`, `IFRAME`은 컴팩트 탭 스트립과 콘텐츠 Pane, `CUSTOM`은 `FlexBox` 기반 고객사 MDI 창 스트립을 사용한다. 세 Adapter 모두 각 탭의 `×`와 공통 Workspace 액션으로 닫을 수 있다. Portal Core는 같은 계약으로 열기·닫기·활성화·메시지를 호출하고, Adapter가 서로 다른 Workspace 컨테이너를 소유한다.
 
 다만 `CUSTOM`은 고객사 실제 SDK와 연계된 상태가 아니라, 연계 Adapter를 넣을 위치와 lifecycle 구조를 보여 주는 참조 구현이다.
 

@@ -10,7 +10,7 @@ export default class CustomWorkspaceAdapter implements WorkspaceAdapter {
   public readonly key = "CUSTOM" as const;
   private opened = new Map<string, { info: OpenedApplication; control: Control }>();
   private activeId?: string;
-  private readonly tabs = new CustomerMdiWorkspaceContainer(id => this.activate(id));
+  private readonly tabs = new CustomerMdiWorkspaceContainer(id => this.activate(id), id => this.close(id));
   public open(app: ApplicationConfig): void {
     if (!this.opened.has(app.id)) { const info = { instanceId: app.id, applicationId: app.id, title: app.title, icon: app.icon }; const control = this.createContent(app); this.opened.set(app.id, { info, control }); this.tabs.open(info, control); }
     this.activate(app.id);

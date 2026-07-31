@@ -19,9 +19,9 @@
 
 | Key | 구현체 | 실제 컨테이너 | 지원 범위 |
 | --- | --- | --- | --- |
-| `UI5_TAB` | `Ui5TabWorkspaceAdapter` | `AdapterTabContainer` / SAPUI5 `IconTabBar` | UI5 Component, iframe, Custom Handler 예시 |
-| `IFRAME` | `IframeWorkspaceAdapter` | `IframeWorkspaceContainer` / `SegmentedButton` + 콘텐츠 Pane | URL 기반 iframe 앱만 |
-| `CUSTOM` | `CustomWorkspaceAdapter` | `CustomerMdiWorkspaceContainer` / `FlexBox` 창 스트립 + 콘텐츠 Pane | 고객사 MDI 연계 구조 예시 |
+| `UI5_TAB` | `Ui5TabWorkspaceAdapter` | `AdapterTabContainer` / SAPUI5 `TabContainer` | UI5 Component, iframe, Custom Handler 예시. 각 탭 닫기 지원 |
+| `IFRAME` | `IframeWorkspaceAdapter` | `IframeWorkspaceContainer` / 컴팩트 탭 스트립 + 콘텐츠 Pane | URL 기반 iframe 앱만. 각 탭 닫기 지원 |
+| `CUSTOM` | `CustomWorkspaceAdapter` | `CustomerMdiWorkspaceContainer` / `FlexBox` 창 스트립 + 콘텐츠 Pane | 고객사 MDI 연계 구조 예시. 각 탭 닫기 지원 |
 
 따라서 Adapter를 바꾸면 테두리 색만 바뀌는 것이 아니라 Workspace의 탭/창 컨트롤과 콘텐츠 배치 방식 자체가 바뀐다. 다만 `CUSTOM`은 현재 고객사 SDK를 연결하지 않은 참조 구현이므로, 실제 고객 컨트롤의 기능과 동일하다고 해석하면 안 된다.
 

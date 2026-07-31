@@ -22,14 +22,19 @@ export default class CustomerMdiWorkspaceContainer {
     this.tabStrip,
     this.contentArea
   ] }).addStyleClass("customerMdiWorkspaceContainer");
-  private readonly items = new Map<string, { tab: Button; content: Control }>();
+  private readonly items = new Map<string, { tab: HBox; openButton: Button; content: Control }>();
 
-  public constructor(private readonly onActivate: (id: string) => void) {}
+  public constructor(
+    private readonly onActivate: (id: string) => void,
+    private readonly onClose: (id: string) => void
+  ) {}
 
   public open(info: OpenedApplication, content: Control): void {
     if (!this.items.has(info.instanceId)) {
-      const tab = new Button({ text: info.title, icon: info.icon, type: "Transparent", press: () => this.onActivate(info.instanceId) }).addStyleClass("customerMdiTab");
-      this.items.set(info.instanceId, { tab, content });
+      const openButton = new Button({ text: info.title, icon: info.icon, type: "Transparent", tooltip: info.title, press: () => this.onActivate(info.instanceId) }).addStyleClass("customerMdiTabOpen");
+      const closeButton = new Button({ icon: "sap-icon://decline", type: "Transparent", tooltip: `${info.title} 탭 닫기`, press: () => this.onClose(info.instanceId) }).addStyleClass("customerMdiTabClose");
+      const tab = new HBox({ alignItems: "Center", items: [openButton, closeButton] }).addStyleClass("customerMdiTab");
+      this.items.set(info.instanceId, { tab, openButton, content });
       this.tabStrip.addItem(tab);
     }
     this.activate(info.instanceId);
@@ -49,8 +54,8 @@ export default class CustomerMdiWorkspaceContainer {
   public activate(id: string): void {
     const entry = this.items.get(id);
     if (!entry) return;
-    this.items.forEach(item => item.tab.setType("Transparent"));
-    entry.tab.setType("Emphasized");
+    this.items.forEach(item => item.tab.removeStyleClass("customerMdiTabActive"));
+    entry.tab.addStyleClass("customerMdiTabActive");
     this.contentArea.removeAllItems();
     this.contentArea.addItem(entry.content);
   }
