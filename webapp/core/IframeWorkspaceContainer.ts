@@ -1,6 +1,7 @@
 import Control from "sap/ui/core/Control";
 import Button from "sap/m/Button";
 import FlexBox from "sap/m/FlexBox";
+import HBox from "sap/m/HBox";
 import VBox from "sap/m/VBox";
 import { OpenedApplication } from "./models";
 
@@ -14,19 +15,29 @@ export default class IframeWorkspaceContainer {
   private readonly tabs = new FlexBox({ wrap: "NoWrap", alignItems: "Center" }).addStyleClass("iframeWorkspaceTabStrip");
   private readonly contentArea = new VBox({ fitContainer: true }).addStyleClass("iframeWorkspaceContentPane");
   private readonly root = new VBox({ fitContainer: true, items: [this.tabs, this.contentArea] }).addStyleClass("iframeWorkspaceContainer");
-  private readonly items = new Map<string, { tab: Button; content: Control }>();
+  private readonly items = new Map<string, { tab: HBox; content: Control }>();
 
-  public constructor(private readonly onActivate: (id: string) => void) {}
+  public constructor(
+    private readonly onActivate: (id: string) => void,
+    private readonly onClose: (id: string) => void
+  ) {}
 
   public open(info: OpenedApplication, content: Control): void {
     if (!this.items.has(info.instanceId)) {
-      const tab = new Button({
+      const openButton = new Button({
         text: info.title,
         icon: info.icon,
         type: "Transparent",
         tooltip: info.title,
         press: () => this.onActivate(info.instanceId)
-      }).addStyleClass("iframeWorkspaceTab");
+      }).addStyleClass("iframeWorkspaceTabOpen");
+      const closeButton = new Button({
+        icon: "sap-icon://decline",
+        type: "Transparent",
+        tooltip: `${info.title} 탭 닫기`,
+        press: () => this.onClose(info.instanceId)
+      }).addStyleClass("iframeWorkspaceTabClose");
+      const tab = new HBox({ alignItems: "Center", items: [openButton, closeButton] }).addStyleClass("iframeWorkspaceTab");
       this.items.set(info.instanceId, { tab, content });
       this.tabs.addItem(tab);
     }
