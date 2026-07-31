@@ -11,7 +11,10 @@ export default class AdapterTabContainer {
   public constructor(onActivate: (id: string) => void, onClose: (id: string) => void) {
     this.tabs.attachItemSelect(event => {
       const item = event.getParameter("item") as TabContainerItem;
-      if (!this.selecting) onActivate(item.getKey());
+      // TabContainer may fire this event without an item while the selected
+      // item is being removed. That is a container lifecycle event, not a
+      // user activation request.
+      if (!this.selecting && item) onActivate(item.getKey());
     });
     this.tabs.attachItemClose(event => {
       event.preventDefault();
@@ -26,7 +29,18 @@ export default class AdapterTabContainer {
     }
     this.activate(info.instanceId);
   }
-  public close(id: string): void { const item = this.items.get(id); if (!item) return; this.tabs.removeItem(item); item.destroy(); this.items.delete(id); }
+  public close(id: string): void {
+    const item = this.items.get(id);
+    if (!item) return;
+    this.selecting = true;
+    try {
+      this.tabs.removeItem(item);
+      item.destroy();
+      this.items.delete(id);
+    } finally {
+      this.selecting = false;
+    }
+  }
   public closeAll(): void { [...this.items.keys()].forEach(id => this.close(id)); }
   public activate(id: string): void {
     const item = this.items.get(id);

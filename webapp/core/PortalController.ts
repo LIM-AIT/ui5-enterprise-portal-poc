@@ -90,10 +90,23 @@ export default class PortalController {
   }
   public closeAll(): void { this.workspace.closeAll(); this.activeInstanceId = undefined; }
   public setWorkspaceAdapter(key: WorkspaceAdapterKey): void {
+    if (this.workspace.key === key) return;
+    // Switching an adapter changes only the MDI container. Reopen the active
+    // application set in the replacement container so the user can compare
+    // the workspace implementations without losing the current context.
+    const openedApplicationIds = this.workspace.getOpenedApplications().map(item => item.applicationId);
+    const activeApplicationId = this.activeInstanceId;
     this.workspace.closeAll();
-    this.activeInstanceId = undefined;
     this.workspace = key === "IFRAME" ? new IframeWorkspaceAdapter() : key === "CUSTOM" ? new CustomWorkspaceAdapter() : new Ui5TabWorkspaceAdapter();
     this.launcher.setWorkspaceAdapter(this.workspace);
+    openedApplicationIds.forEach(applicationId => {
+      const app = this.apps.find(candidate => candidate.id === applicationId);
+      if (app) this.workspace.open(app);
+    });
+    this.activeInstanceId = activeApplicationId && openedApplicationIds.includes(activeApplicationId)
+      ? activeApplicationId
+      : openedApplicationIds[0];
+    if (this.activeInstanceId) this.workspace.activate(this.activeInstanceId);
   }
   public setAdminOpen(open: boolean): void { this.adminOpen = open; }
   public getWorkspaceControl(): Control | undefined { return this.workspace.getWorkspaceControl(); }
