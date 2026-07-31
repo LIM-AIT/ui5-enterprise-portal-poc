@@ -14,7 +14,7 @@ export default class CustomWorkspaceAdapter implements WorkspaceAdapter {
   private activeId?: string;
   private readonly tabs = new AdapterTabContainer(id => this.activate(id));
   private readonly container = new VBox({ fitContainer: true, items: [
-    new MessageStrip({ text: "Customer MDI simulation · this adapter owns the tab strip and content area.", type: "Information", showIcon: true }),
+    new MessageStrip({ text: "고객사 Custom MDI 시뮬레이션 · 이 Adapter가 탭 영역과 콘텐츠 영역을 직접 소유합니다.", type: "Information", showIcon: true }),
     this.tabs.getControl()
   ] }).addStyleClass("customWorkspaceAdapter");
   public open(app: ApplicationConfig): void {

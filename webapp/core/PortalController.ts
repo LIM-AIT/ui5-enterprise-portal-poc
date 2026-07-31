@@ -184,11 +184,26 @@ export default class PortalController {
       return menu ? { ...menu, applicationType: app.applicationType, navigationMode: app.navigationMode } : undefined;
     }).filter((item): item is MenuItem & Pick<ApplicationConfig, "applicationType" | "navigationMode"> => Boolean(item));
   }
-  private workspaceAdapterInfo(): { label: string; description: string } {
-    const infos: Record<WorkspaceAdapterKey, { label: string; description: string }> = {
-      UI5_TAB: { label: "UI5 Tab Adapter", description: "SAPUI5 Component와 iframe을 표준 탭 Workspace에서 실행합니다." },
-      IFRAME: { label: "Iframe Adapter", description: "React·Vue·Nexacro 등 URL 기반 Non-SAP 앱 연계를 검증합니다." },
-      CUSTOM: { label: "Custom Adapter", description: "고객사의 기존 MDI 또는 탭 컨테이너 구현체를 연결하는 확장 지점입니다." }
+  private workspaceAdapterInfo(): { label: string; description: string; supportedApplications: string; visualCue: string } {
+    const infos: Record<WorkspaceAdapterKey, { label: string; description: string; supportedApplications: string; visualCue: string }> = {
+      UI5_TAB: {
+        label: "기본 UI5 통합 탭",
+        description: "SAPUI5 Component와 iframe 앱을 하나의 표준 UI5 탭 Workspace에서 함께 실행합니다.",
+        supportedApplications: "지원: UI5 Component · iframe · Custom Handler",
+        visualCue: "기본 UI5 탭"
+      },
+      IFRAME: {
+        label: "Non-SAP iframe 전용 탭",
+        description: "URL 기반 Non-SAP 앱을 iframe 탭으로 실행하는 연계 방식을 검증합니다.",
+        supportedApplications: "지원: React · Vue · HTML · Nexacro(웹 URL)",
+        visualCue: "iframe 전용"
+      },
+      CUSTOM: {
+        label: "고객사 Custom MDI 어댑터",
+        description: "고객사의 기존 MDI 또는 커스텀 탭 컨트롤을 연결하기 위한 확장 구조입니다.",
+        supportedApplications: "지원: 고객사 Tab Control API 연동",
+        visualCue: "보라색 확장 영역"
+      }
     };
     return infos[this.workspace.key];
   }
