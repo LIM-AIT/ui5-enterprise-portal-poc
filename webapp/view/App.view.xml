@@ -4,9 +4,9 @@
       <Toolbar class="portalHeader">
         <core:Icon src="sap-icon://business-objects-experience" class="portalBrandIcon"/>
         <VBox class="portalBrand"><Title text="Enterprise Portal" level="H2"/><Text text="UI5 MDI Reference Portal"/></VBox>
-        <ToolbarSpacer/><Button text="홈" icon="sap-icon://home" type="Transparent" press=".onPortalHome"/><Text text="Demo role" class="headerHint"/>
-        <Select width="10rem" selectedKey="{portal>/currentRole}" change=".onRoleChange"><items><core:Item key="PORTAL_USER" text="PORTAL_USER"/><core:Item key="FI_USER" text="FI_USER"/><core:Item key="HR_USER" text="HR_USER"/><core:Item key="APPROVER" text="APPROVER"/><core:Item key="PORTAL_ADMIN" text="PORTAL_ADMIN"/></items></Select>
-        <Select width="14rem" selectedKey="{portal>/workspaceAdapter}" change=".onWorkspaceAdapterChange" tooltip="MDI Workspace 실행 방식"><items><core:Item key="UI5_TAB" text="기본: UI5 통합 탭"/><core:Item key="IFRAME" text="Non-SAP: iframe 전용 탭"/><core:Item key="CUSTOM" text="확장: 고객사 Custom MDI"/></items></Select>
+        <ToolbarSpacer/><Button text="홈" icon="sap-icon://home" type="Transparent" press=".onPortalHome"/>
+        <VBox class="headerSelectorGroup"><Text text="데모 사용자 역할" class="headerHint" tooltip="선택한 역할에 따라 메뉴와 실행 가능한 앱이 변경됩니다."/><Select width="12.5rem" selectedKey="{portal>/currentRole}" change=".onRoleChange" tooltip="역할 기반 메뉴·권한 시연"><items><core:Item key="PORTAL_USER" text="포털 사용자 · PORTAL_USER"/><core:Item key="FI_USER" text="재무 담당자 · FI_USER"/><core:Item key="HR_USER" text="인사 담당자 · HR_USER"/><core:Item key="APPROVER" text="승인 담당자 · APPROVER"/><core:Item key="PORTAL_ADMIN" text="포털 관리자 · PORTAL_ADMIN"/></items></Select></VBox>
+        <VBox class="headerSelectorGroup"><Text text="MDI Workspace 방식" class="headerHint" tooltip="오른쪽 Workspace의 탭 컨테이너 구현 방식을 변경합니다."/><Select width="14rem" selectedKey="{portal>/workspaceAdapter}" change=".onWorkspaceAdapterChange" tooltip="MDI Workspace 실행 방식"><items><core:Item key="UI5_TAB" text="기본: UI5 통합 탭"/><core:Item key="IFRAME" text="Non-SAP: iframe 전용 탭"/><core:Item key="CUSTOM" text="확장: 고객사 Custom MDI"/></items></Select></VBox>
         <Button text="관리자 설정" icon="sap-icon://settings" visible="{= ${portal>/currentRole} === 'PORTAL_ADMIN' }" press=".onOpenAdmin"/><Avatar initials="JD" displaySize="XS" tooltip="Jane Doe"/>
       </Toolbar>
       <HBox fitContainer="true" class="portalBody">
