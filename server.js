@@ -9,7 +9,7 @@ app.use("/non-sap/vue-procurement", express.static(path.join(__dirname, "non-sap
 
 // In-memory persistence for the PoC. Restarting the server resets the configuration.
 const seed = {
-  users: [{ id: "jane.doe", name: "Jane Doe", roles: ["PORTAL_USER", "FI_USER"] }],
+  users: [{ id: "jane.doe", name: "임우상", roles: ["PORTAL_USER", "FI_USER"] }],
   roles: ["PORTAL_USER", "FI_USER", "HR_USER", "APPROVER", "PORTAL_ADMIN"],
   menus: [
     { id: "home", title: "\uD3EC\uD138 \uD648", description: "Portal Dashboard\ub85c \ub3cc\uc544\uac11\ub2c8\ub2e4.", icon: "sap-icon://home", order: 10, applicationId: "ui5-sample", roles: ["PORTAL_USER"], active: true },

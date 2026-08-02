@@ -9,6 +9,7 @@ import mock from "../mock/data";
 import ApplicationLauncher from "./ApplicationLauncher";
 import PortalMessageBroker from "./PortalMessageBroker";
 import MockIdentityProvider from "./IdentityProvider";
+import { AssistantBusinessContext } from "./AssistantProvider";
 
 type AuditRecord = { timestamp: string; category: "EXECUTION" | "MESSAGE"; title: string; description: string; icon: string };
 
@@ -19,10 +20,12 @@ export default class PortalController {
   private favorites = ["ui5-sample"];
   private recent: string[] = [];
   private userId = "jane.doe";
+  private userName = "임우상";
   private lastMessage = "";
   private adminOpen = false;
   private activeInstanceId?: string;
   private auditRecords: AuditRecord[] = [];
+  private readonly businessContexts = new Map<string, AssistantBusinessContext>();
   private readonly messageListeners = new Set<() => void>();
   private workspace: WorkspaceAdapter = this.createWorkspaceAdapter("UI5_TAB");
   private broker = new PortalMessageBroker(EventBus.getInstance());
@@ -38,6 +41,7 @@ export default class PortalController {
       this.workspace.sendMessage(message);
     });
     this.broker.subscribe("portal", message => {
+      if (message.eventType === "AI_CONTEXT_CHANGED") this.updateBusinessContext(message.payload);
       this.lastMessage = `메시지 수신 · ${message.source} / ${message.eventType}`;
       this.workspace.sendMessage(this.broker.create("portal", message.source, "PORTAL_MESSAGE_ACK", {
         receivedEventType: message.eventType,
@@ -112,18 +116,22 @@ export default class PortalController {
   public getWorkspaceControl(): Control | undefined { return this.workspace.getWorkspaceControl(); }
   public getActiveControl(): Control | undefined { return this.workspace.getActiveControl(); }
   public getViewState(): object {
+    const dashboardRecent = this.dashboardItems(this.recent);
     return {
+      userName: this.userName,
+      currentDate: new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "long", day: "numeric", weekday: "long" }).format(new Date()),
       currentRole: this.role,
       currentCollection: this.collection,
       visibleMenus: this.visibleMenus(),
       menuTree: this.menuTree(),
-      dashboardQuickLaunch: this.visibleMenus().slice(0, 4),
-      dashboardFavorites: this.dashboardItems(this.favorites),
-      dashboardRecent: this.dashboardItems(this.recent),
+      navigationApplicationCount: this.authorizedMenus().length,
+      activeApplicationId: this.activeInstanceId ?? "",
+      dashboardRecent,
       applicationCatalog: this.applicationCatalog(),
       workspaceAdapterInfo: this.workspaceAdapterInfo(),
       auditRecords: this.auditRecords,
       openedApplications: this.workspace.getOpenedApplications(),
+      activeBusinessContext: this.activeInstanceId ? this.businessContexts.get(this.activeInstanceId) : undefined,
       lastMessage: this.lastMessage,
       adminOpen: this.adminOpen,
       workspaceAdapter: this.workspace.key
@@ -146,7 +154,7 @@ export default class PortalController {
     this.favorites = configuration.favorites?.filter(item => item.userId === this.userId).map(item => item.applicationId) ?? [];
     this.recent = configuration.recent?.filter(item => item.userId === this.userId).sort((a, b) => new Date(b.executedAt).getTime() - new Date(a.executedAt).getTime()).map(item => item.applicationId) ?? [];
   }
-  public async loadIdentity(): Promise<void> { this.userId = (await this.identity.getCurrentUser()).id; }
+  public async loadIdentity(): Promise<void> { const user = await this.identity.getCurrentUser(); this.userId = user.id; this.userName = "임우상"; }
   /** Mock CRUD boundary. Replace this with a protected configuration API in a productive deployment. */
   public async saveAdminState(state: { menus: Array<MenuItem & { rolesText?: string }>; applications: Array<ApplicationConfig & { rolesText?: string }> }): Promise<void> {
     const applications = state.applications.map(app => ({
@@ -177,11 +185,12 @@ export default class PortalController {
     this.menus = configuration.menus;
   }
   private visibleMenus(): Array<MenuItem & { favorite: boolean }> {
-    let source = this.menus.filter(m => m.active && this.authorized(m.roles) && m.applicationId);
+    let source = this.authorizedMenus();
     if (this.collection === "favorites") source = source.filter(m => this.favorites.includes(m.applicationId!));
     if (this.collection === "recent") source = source.filter(m => this.recent.includes(m.applicationId!));
     return source.filter(m => !this.query || `${m.title} ${m.description}`.toLowerCase().includes(this.query)).sort((a, b) => a.order - b.order).map(menu => ({ ...menu, favorite: this.favorites.includes(menu.applicationId!) }));
   }
+  private authorizedMenus(): MenuItem[] { return this.menus.filter(menu => menu.active && this.authorized(menu.roles) && menu.applicationId); }
   /** Converts per-user application history into launchable and role-filtered dashboard cards. */
   private dashboardItems(applicationIds: string[]): Array<MenuItem & { favorite: boolean }> {
     return applicationIds.map(applicationId => this.menus
@@ -222,6 +231,24 @@ export default class PortalController {
   }
   private recordAudit(category: AuditRecord["category"], title: string, description: string, icon: string): void {
     this.auditRecords = [{ timestamp: new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }), category, title, description, icon }, ...this.auditRecords].slice(0, 20);
+  }
+  private updateBusinessContext(payload: unknown): void {
+    if (typeof payload !== "object" || payload === null) return;
+    const candidate = payload as Partial<AssistantBusinessContext>;
+    if (!candidate.applicationId || !candidate.kind || !candidate.title || !Array.isArray(candidate.fields)) return;
+    const fields = candidate.fields
+      .filter(field => field && typeof field.label === "string" && typeof field.value === "string")
+      .map(field => ({ label: field.label, value: field.value, state: field.state }));
+    this.businessContexts.set(candidate.applicationId, {
+      applicationId: candidate.applicationId,
+      kind: candidate.kind,
+      title: candidate.title,
+      entityId: candidate.entityId,
+      summary: candidate.summary,
+      fields,
+      data: candidate.data,
+      updatedAt: new Date().toISOString()
+    });
   }
   private createWorkspaceAdapter(key: WorkspaceAdapterKey): WorkspaceAdapter {
     const onWorkspaceChange = () => {
